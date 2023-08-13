@@ -10,15 +10,48 @@
 //         3. Data line for the sensor is at Digital 30 of the arduino.
 //         4. Connect the Data pin of the sensor to Digital pin 30 of the arduino mega and make sure that power passes through the line without running through the 4.7k ohm resistor.
 
+//      CONNECTING THE LEDS FOR TEMPERATURE
+//         1. Ensure all LEDs are connected to a resistor of lower resistance(around 0.5 to 1k ohm)
+//         2. Connect the Blue LED to digital pin 24
+//         3. Connect the Green LED to digital pin 25
+//         4. Connect the Red LED to digital pin 26
+
+//      CONNECTING THE BUZZER
+//         1. Ensure that Buzzer passes through a resistance similar to that of an LED.
+//         2. Connect the Buzzer to digital pin 22
+
+//Dependencies
+#include<OneWire.h>
+#include<DallasTemperature.h>
+
+//Data wire for communication with the temperature sensor
+#define ONE_WIRE_BUS 30
+
+//Passing oneWire reference to Dallas Temperature sensor
+DallasTemperature sensors(&oneWire);
+
 void setup() {
+  
+  //Variables
+  float idealT_C = 70;
+  int tolerance_C = 2;
+  float Temp_C;
+
+
   //Digital Pins for Arduino Mega
   //The Termperature sensor is working in non-parasite mode.
   
+  //Start serial communication for debugging purposes
+  Serial.being(9600);
+  //Starting the library
+  sensors.being();
+
   pinMode(22, OUTPUT);     //Pin for Buzzer
   pinMode(24, OUTPUT);     //Pin for Blue  LED
   pinMode(25, OUTPUT);     //Pin for Green LED
   pinMode(26, OUTPUT);     //Pin for Red   LED
-  pinMode(30, INPUT);      //Pin for Input for DS18B20
+
+
 }
 
 void loop() {
@@ -26,5 +59,44 @@ void loop() {
   digitalWrite(22, HIGH);  
   delay(1000);                      
   digitalWrite(22, LOW);  
-  delay(1000);                      
+  delay(1000);    
+
+  //Calling sensors.requestTemperatures() to issue a global temperature  
+  sensors.requestTemperatures();              
+  Serial.print("Celsius temperature: ");
+  // byIndex(0) means it refers to the first sensor in the bus because we could have several sensors in the IC bus.
+  Serial.print(sensors.getTempCByIndex(0)); 
+  Serial.print(" - Fahrenheit temperature: ");
+  Serial.println(sensors.getTempFByIndex(0));
+  delay(1000);
+
+  //Grabbing the temperatures to separate values
+  Temp_C = sensors.getTempCByIndex(0);
+
+  if(Temp_C < idealT_C - tolerance)
+  {
+    digitalWrite(24, HIGH); 
+    digitalWrite(22, HIGH); 
+    delay(500);                      
+    digitalWrite(24, LOW);  
+    digitalWrite(22, LOW);
+    delay(500);
+  }
+  else if(Temp_C > idealT_C - tolerance && Temp-C < idealT_C + tolerance)
+  {
+    digitalWrite(25, HIGH); 
+    delay(1000);                      
+    digitalWrite(25, LOW);  
+    delay(1000);
+  }
+  else 
+  {
+    digitalWrite(26, HIGH);
+    digitalWrite(22, HIGH);
+    delay(500);                      
+    digitalWrite(26, LOW); 
+    digitalWrite(22, LOW); 
+    delay(500);
+  }
+
 }
