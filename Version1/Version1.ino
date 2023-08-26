@@ -1,3 +1,9 @@
+//DEPENDENCIES
+#include <CheckDS18B20.h>
+#include <DiscoverFakeDS18B20.h>
+#include <DallasTemperature.h>
+#include <OneWire.h>
+
 //This is a blinking Program. We have to build a program that runs a buzzer for high and low temperature detection, one DS18B20 thermometer Probes, 3 lights for temperature checking
 //Version 1 is for a low budget project
 //Version 2 will have a buzzer for high and low temperature detection, two thermometer probes (average temperature will be calculated), 3 lights for temperature checking and 1 LCD display to show current temperature reading.
@@ -20,31 +26,29 @@
 //         1. Ensure that Buzzer passes through a resistance similar to that of an LED.
 //         2. Connect the Buzzer to digital pin 22
 
-//Dependencies
-#include<OneWire.h>
-#include<DallasTemperature.h>
-
 //Data wire for communication with the temperature sensor
 #define ONE_WIRE_BUS 30
+
+//Setting up a oneWire instance to communicate with any OneWire Device
+OneWire oneWire(ONE_WIRE_BUS);
 
 //Passing oneWire reference to Dallas Temperature sensor
 DallasTemperature sensors(&oneWire);
 
+//Variables
+float idealT_C = 30;
+int tolerance_C = 1;
+float Temp_C;
+
 void setup() {
   
-  //Variables
-  float idealT_C = 70;
-  int tolerance_C = 2;
-  float Temp_C;
-
-
   //Digital Pins for Arduino Mega
   //The Termperature sensor is working in non-parasite mode.
   
   //Start serial communication for debugging purposes
-  Serial.being(9600);
+  Serial.begin(9600);
   //Starting the library
-  sensors.being();
+  sensors.begin();
 
   pinMode(22, OUTPUT);     //Pin for Buzzer
   pinMode(24, OUTPUT);     //Pin for Blue  LED
@@ -54,12 +58,7 @@ void setup() {
 
 }
 
-void loop() {
-  //Beeping the buzzer
-  digitalWrite(22, HIGH);  
-  delay(1000);                      
-  digitalWrite(22, LOW);  
-  delay(1000);    
+void loop() {  
 
   //Calling sensors.requestTemperatures() to issue a global temperature  
   sensors.requestTemperatures();              
@@ -73,30 +72,30 @@ void loop() {
   //Grabbing the temperatures to separate values
   Temp_C = sensors.getTempCByIndex(0);
 
-  if(Temp_C < idealT_C - tolerance)
+  if(Temp_C < idealT_C - tolerance_C)
   {
     digitalWrite(24, HIGH); 
     digitalWrite(22, HIGH); 
-    delay(500);                      
+    delay(200);                      
     digitalWrite(24, LOW);  
     digitalWrite(22, LOW);
-    delay(500);
+    delay(200);
   }
-  else if(Temp_C > idealT_C - tolerance && Temp-C < idealT_C + tolerance)
+  else if(Temp_C > (idealT_C - tolerance_C) && Temp_C < (idealT_C + tolerance_C))
   {
     digitalWrite(25, HIGH); 
     delay(1000);                      
     digitalWrite(25, LOW);  
-    delay(1000);
+    delay(100);
   }
   else 
   {
     digitalWrite(26, HIGH);
     digitalWrite(22, HIGH);
-    delay(500);                      
+    delay(200);                      
     digitalWrite(26, LOW); 
     digitalWrite(22, LOW); 
-    delay(500);
+    delay(200);
   }
 
 }
