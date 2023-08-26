@@ -81,7 +81,7 @@ void loop() {
     digitalWrite(22, LOW);
     delay(200);
   }
-  else if(Temp_C > (idealT_C - tolerance_C) && Temp_C < (idealT_C + tolerance_C))
+  else if(Temp_C >= (idealT_C - tolerance_C) && Temp_C <= (idealT_C + tolerance_C))
   {
     digitalWrite(25, HIGH); 
     delay(1000);                      
