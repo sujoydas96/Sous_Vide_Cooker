@@ -39,6 +39,8 @@ DallasTemperature sensors(&oneWire);
 float idealT_C = 30;
 int tolerance_C = 1;
 float Temp_C;
+float Time_operational_hours;     //Required Time is entered in this variable
+float total_time_operational;     //T1 + T2 is added to this constantly for calculation
 
 void setup() {
   
@@ -54,10 +56,16 @@ void setup() {
   pinMode(24, OUTPUT);     //Pin for Blue  LED
   pinMode(25, OUTPUT);     //Pin for Green LED
   pinMode(26, OUTPUT);     //Pin for Red   LED
-
-
 }
 
+int counter(float A, float B){
+  A = A/3600000;           //Conversion to Hours
+  B = B/3600000;           //Conversion to Hours
+  total_time_operational = A+B;
+  if(total_time_operational >= Time_operational_hours)
+    digitalWrite(22, HIGH); 
+}
+  
 void loop() {  
 
   //Calling sensors.requestTemperatures() to issue a global temperature  
@@ -83,10 +91,13 @@ void loop() {
   }
   else if(Temp_C >= (idealT_C - tolerance_C) && Temp_C <= (idealT_C + tolerance_C))
   {
+    T1 = millis();
     digitalWrite(25, HIGH); 
     delay(1000);                      
     digitalWrite(25, LOW);  
     delay(100);
+    T2 = millis();
+    counter(T1,T2);
   }
   else 
   {
@@ -97,5 +108,4 @@ void loop() {
     digitalWrite(22, LOW); 
     delay(200);
   }
-
 }
