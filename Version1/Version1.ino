@@ -75,6 +75,10 @@ void loop() {
   Serial.print(sensors.getTempCByIndex(0)); 
   Serial.print(" - Fahrenheit temperature: ");
   Serial.println(sensors.getTempFByIndex(0));
+  Serial.print("\nTime in temperature (hours): ");
+  Serial.println(total_time_operational);
+  Serial.print("\nTime in temperature (Minutes): ");
+  Serial.println(total_time_operational*60);
   delay(1000);
 
   //Grabbing the temperatures to separate values
